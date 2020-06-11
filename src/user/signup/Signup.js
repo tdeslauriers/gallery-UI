@@ -72,13 +72,22 @@ class Signup extends Component {
       username: this.state.username.value,
       password: this.state.password.value
     };
-    signup(signupRequest).then(response => {
-      notification.success({
-        message: "des Lauriers World",
-        description:
-          "Thanks! You're successfully registered. Please login to continue."
+    signup(signupRequest)
+      .then(response => {
+        notification.success({
+          message: "des Lauriers World",
+          description:
+            "Thanks! You're successfully registered. Please login to continue."
+        });
+        this.props.history.push("/login");
+      })
+      .catch(error => {
+        notification.error({
+          message: "des Lauriers World",
+          description:
+            error.message || "Sorry! Something went wrong. Please try again."
+        });
       });
-    });
   }
 
   isFormValid() {
@@ -115,8 +124,8 @@ class Signup extends Component {
             </FormItem>
             <FormItem
               label="Last Name"
-              validateStatus={this.state.firstname.validateStatus}
-              help={this.state.firstname.errorMsg}
+              validateStatus={this.state.lastname.validateStatus}
+              help={this.state.lastname.errorMsg}
             >
               <Input
                 size="large"
@@ -228,7 +237,7 @@ class Signup extends Component {
         validateStatus: "error",
         errorMsg: `Entry is too short (Minimum ${LASTNAME_MIN_LENGTH} characters needed).`
       };
-    } else if (lastname.length > FIRSTNAME_MAX_LENGTH) {
+    } else if (lastname.length > LASTNAME_MAX_LENGTH) {
       return {
         validateStatus: "error",
         errorMsg: `Entry is too long (Maximum ${LASTNAME_MAX_LENGTH} characters allowed).`

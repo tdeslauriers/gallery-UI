@@ -7,14 +7,16 @@ import { ACCESS_TOKEN } from "../constants";
 
 import Login from "../user/login/Login";
 import Signup from "../user/signup/Signup";
+import Home from "../common/Home";
 import Profile from "../user/profile/Profile";
+import Gallery from "../image/Gallery";
+import Pic from "../image/Pic";
 import AppHeader from "../common/AppHeader";
 import NotFound from "../common/NotFound";
 import LoadingIndicator from "../common/LoadingIndicator";
 import PrivateRoute from "../common/PrivateRoute";
 
 import { Layout, notification } from "antd";
-import Home from "../common/Home";
 const { Content } = Layout;
 
 class App extends Component {
@@ -25,7 +27,7 @@ class App extends Component {
       currentUser: null,
       navs: [],
       isAuthenticated: false,
-      isLoading: false
+      isLoading: false,
     };
 
     this.handleLogout = this.handleLogout.bind(this);
@@ -36,45 +38,45 @@ class App extends Component {
     notification.config({
       placement: "topRight",
       top: 70,
-      duration: 3
+      duration: 3,
     });
   }
 
   loadCurrentUser() {
     this.setState({
-      isLoading: true
+      isLoading: true,
     });
     getCurrentUser()
-      .then(response => {
+      .then((response) => {
         this.setState({
           currentUser: response,
           isAuthenticated: true,
-          isLoading: false
+          isLoading: false,
         });
       })
-      .catch(error => {
+      .catch((error) => {
         this.setState({
-          isLoading: false
+          isLoading: false,
         });
       });
   }
 
   loadNav() {
     this.setState({
-      isLoading: true
+      isLoading: true,
     });
-    getGalleryNav().then(response => {
+    getGalleryNav().then((response) => {
       this.setState({
         navs: response,
         isAuthenticated: true,
-        isLoading: false
+        isLoading: false,
       });
     });
   }
 
-  componentDidMount() {
-    this.loadNav();
+  componentWillMount() {
     this.loadCurrentUser();
+    this.loadNav();
   }
 
   handleLogout(
@@ -87,23 +89,24 @@ class App extends Component {
     this.setState({
       currentUser: null,
       nav: null,
-      isAuthenticated: false
+      isAuthenticated: false,
     });
 
     this.props.history.push(redirectTo);
 
     notification[notificationType]({
       message: "des Lauriers World",
-      description: description
+      description: description,
     });
   }
 
   handleLogin() {
     notification.success({
       message: "des Lauriers World",
-      description: "You're successfully logged in."
+      description: "You're successfully logged in.",
     });
     this.loadCurrentUser();
+    this.loadNav();
     this.props.history.push("/");
   }
 
@@ -125,7 +128,7 @@ class App extends Component {
               <Route
                 exact
                 path="/"
-                render={props => (
+                render={(props) => (
                   <Home
                     isAuthenticated={this.state.isAuthenticated}
                     currentUser={this.state.currentUser}
@@ -135,7 +138,7 @@ class App extends Component {
               ></Route>
               <Route
                 path="/login"
-                render={props => (
+                render={(props) => (
                   <Login onLogin={this.handleLogin} {...props} />
                 )}
               ></Route>
@@ -143,8 +146,21 @@ class App extends Component {
               <PrivateRoute
                 authenticated={this.state.isAuthenticated}
                 path="/users/:username"
-                component={Profile}
+                component={withRouter(Profile)}
                 handleLogout={this.handleLogout}
+              ></PrivateRoute>
+              <PrivateRoute
+                authenticated={this.state.isAuthenticated}
+                exact
+                path="/gallery/:album"
+                component={withRouter(Gallery)}
+                handleLogout={this.handleLogout}
+              ></PrivateRoute>
+              <PrivateRoute
+                authenticated={this.state.isAuthenticated}
+                exact
+                path="/gallery/pic/:uuid"
+                component={withRouter(Pic)}
               ></PrivateRoute>
               <Route component={NotFound}></Route>
             </Switch>

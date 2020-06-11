@@ -4,7 +4,6 @@ import { Link, withRouter } from "react-router-dom";
 import { Layout, Menu, Dropdown, Icon } from "antd";
 
 const Header = Layout.Header;
-const { SubMenu } = Menu;
 
 class AppHeader extends Component {
   constructor(props) {
@@ -21,7 +20,7 @@ class AppHeader extends Component {
   render() {
     let menuItems;
 
-    if (this.props.currentUser) {
+    if (this.props.currentUser && this.props.navs) {
       menuItems = [
         <Menu.Item key="/">
           <Link to="/">
@@ -31,25 +30,11 @@ class AppHeader extends Component {
             </span>
           </Link>
         </Menu.Item>,
-        <SubMenu
-          key="gallery"
-          title={
-            <span>
-              <Icon type="picture" />
-              <span>Gallery </span>
-              <span>
-                <Icon type="down" />
-              </span>
-            </span>
-          }
-          className="gallery-menu"
-        >
-          {this.props.navs.map(nav => (
-            <Menu.Item key={nav.id}>
-              <Link to={`/gallery/${nav.category}`}>{nav.category}</Link>
-            </Menu.Item>
-          ))}
-        </SubMenu>,
+        <Menu.Item key="gallery" className="gallery-menu">
+          <GalleryDropDownMenu
+            navigation={this.props.navs}
+          ></GalleryDropDownMenu>
+        </Menu.Item>,
         <Menu.Item key="profile" className="profile-menu">
           <ProfileDropDownMenu
             currentUser={this.props.currentUser}
@@ -91,7 +76,7 @@ class AppHeader extends Component {
 }
 
 function ProfileDropDownMenu(props) {
-  const dropdownMenu = (
+  const profileDropDownMenu = (
     <Menu
       onClick={props.handlMenuClick}
       className="profile-dropdown-menu"
@@ -115,7 +100,7 @@ function ProfileDropDownMenu(props) {
 
   return (
     <Dropdown
-      overlay={dropdownMenu}
+      overlay={profileDropDownMenu}
       trigger={["click"]}
       getPopupContainer={() =>
         document.getElementsByClassName("profile-menu")[0]
@@ -134,4 +119,68 @@ function ProfileDropDownMenu(props) {
   );
 }
 
+function GalleryDropDownMenu(props) {
+  const galleryDropDownMenu = (
+    <Menu
+      onClick={props.handlMenuClick}
+      className="gallery-dropdown-menu"
+      theme="dark"
+    >
+      <Menu.Item key="gallery-years" className="dropdown-item" disabled>
+        <div className="family-gallery-menu-title">Family Photos: </div>
+        <div className="gallery-subject">
+          <div> by year</div>
+          <div> by subject</div>
+        </div>
+      </Menu.Item>
+      <Menu.Divider />
+      {props.navigation.map(nav => (
+        <Menu.Item key={nav.id}>
+          <Link to={`/gallery/${nav.nav}`}>{nav.nav}</Link>
+        </Menu.Item>
+      ))}
+    </Menu>
+  );
+
+  return (
+    <Dropdown
+      overlay={galleryDropDownMenu}
+      trigger={["click"]}
+      getPopupContainer={() =>
+        document.getElementsByClassName("gallery-menu")[0]
+      }
+    >
+      <a className="ant-dropdown-link">
+        <span>
+          <Icon
+            type="picture"
+            className="nav-icon"
+            style={{ marginRight: 0 }}
+          />
+          <span> Gallery </span>
+        </span>
+        <span>
+          <Icon type="down" />
+        </span>
+      </a>
+    </Dropdown>
+  );
+}
+
 export default withRouter(AppHeader);
+
+// <Menu.Item key="gallery" className="gallery-menu">
+//   <GalleryDropDownMenu
+//     navs={this.props.navs}
+//     handlMenuClick={this.handlMenuClick}
+//   />
+// </Menu.Item>,
+// <Menu.Item key="gallery-years" className="dropdown-item">
+//   <Menu theme="dark">
+//     {props.navs.map(nav => (
+//       <Menu.Item key={nav.id}>
+//         <Link to={`/gallery/${nav.category}`}>{nav.category}</Link>
+//       </Menu.Item>
+//     ))}
+//   </Menu>
+// </Menu.Item>,

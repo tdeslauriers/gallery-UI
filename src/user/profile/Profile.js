@@ -1,4 +1,6 @@
 import React, { Component } from "react";
+import { withRouter } from "react-router-dom";
+
 import "./Profile.css";
 import { getUserProfile } from "../../util/APIUtils";
 import { Avatar } from "antd";
@@ -13,33 +15,33 @@ class Profile extends Component {
     super(props);
     this.state = {
       user: null,
-      isLoading: false
+      isLoading: false,
     };
     this.loadUserProfile = this.loadUserProfile.bind(this);
   }
 
   loadUserProfile(username) {
     this.setState({
-      isLoading: true
+      isLoading: true,
     });
 
     getUserProfile(username)
-      .then(response => {
+      .then((response) => {
         this.setState({
           user: response,
-          isLoading: false
+          isLoading: false,
         });
       })
-      .catch(error => {
+      .catch((error) => {
         if (error.status === 404) {
           this.setState({
             notFound: true,
-            isLoading: false
+            isLoading: false,
           });
         } else {
           this.setState({
             serverError: true,
-            isLoading: false
+            isLoading: false,
           });
         }
       });
@@ -68,7 +70,7 @@ class Profile extends Component {
     if (this.state.serverError) {
       return <ServerError />;
     }
-
+    console.log(this.state.user);
     return (
       <div className="profile">
         {this.state.user ? (
@@ -78,7 +80,7 @@ class Profile extends Component {
                 <Avatar
                   className="user-avatar-circle"
                   style={{
-                    backgroundColor: getAvatarColor(this.state.user.lastname)
+                    backgroundColor: getAvatarColor(this.state.user.lastname),
                   }}
                 >
                   {this.state.user.lastname[0].toUpperCase()}
@@ -100,4 +102,4 @@ class Profile extends Component {
   }
 }
 
-export default Profile;
+export default withRouter(Profile);
